@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<script type="text/javascript">
+	WebFontConfig = {
+		 google: { families: [ 'Source+Sans+Pro:400,700:latin' ] }
+	};
+	(function() {
+		var wf = document.createElement('script');
+		wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+			'://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+		wf.type = 'text/javascript';
+		wf.async = 'true';
+		var s = document.getElementsByTagName('script')[0];
+		s.parentNode.insertBefore(wf, s);
+	})();
+</script>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width">
+	<title>User-friendly input[type=date] and input[type=time] | semicolon.works</title>
+	<link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+	<h1>semicolon.works</h1>
+		<div class="post-single">
+			<h1>User-friendly input[type=date] and input[type=time]</h1>
+			<div class="article-date">08-04-2015</div>
+<p>To make a HTML form easier and friendlier for users to use, HTML5 incorporates quite a few <a href="http://www.html5rocks.com/en/tutorials/forms/html5forms/#toc-inputs-attributes-types">new input types</a>. While <code>url</code>, <code>tel</code> and <code>email</code> types have been quite useful when using a mobile device (special keyboard layouts), I find the biggest pain point is with input date and time. Most of the times you don&#8217;t know what format to input the date in (month first or date first), whether you should use dash versus slash, whether you should include the year etc. <span class="more"></span></p>
+<p>Many solutions have been used to solve this problem. jQuery plugins <a href="http://jqueryui.com/datepicker/">datepicker</a> and <a href="http://jonthornton.github.com/jquery-timepicker/">timepicker</a> are really helpful on desktop. Mobile browsers have done a good job using native date and time picker (Android and iOS) when the input type is specified.</p>
+<p>How do we combine both of these solutions to create a single responsive web form? The answer is really simple.</p>
+<p>My first response was to just call the <code>datepicker()</code> method on any and all <code>input[type=date]</code> elements.</p>
+<pre><code class="javascript">jQuery( document ).ready( function( $ ) {
+  $( 'input[type=date]' ).each( function() {
+    $( this ).datepicker();
+  } );
+} );
+</code></pre>
+<p>There is a few problems associated with this:</p>
+<ul>
+<li><code>input[type=date]</code> does not work very well with datepicker. That means whatever value you select using the datepicker will not be registered on the input field.</li>
+<li><code>datepicker()</code> is not very useful on mobile devices. The pop up window isn&#8217;t the most user friendly thing.</li>
+</ul>
+<p>In order to solve these two problems, the answer would be to:</p>
+<ol>
+<li>Use <code>input[type=text]</code> on desktop as well as call <code>datepicker()</code> method.</li>
+<li>Use <code>input[type=date]</code> on mobile (touch-enabled) devices and not call <code>datepicker()</code>.</li>
+</ol>
+<p>This can be achieved using <a href="http://modernizr.com/">Modernizr</a> to detect whether the device is touch-enabled, and JavaScript to swap out the <code>input[type=date]</code> element with one of type text.</p>
+<p>This could be done with the following snippet:</p>
+<pre><code class="javascript">if ( !$( 'html' ).hasClass( 'touch' ) ){
+    $( 'input[type=date]' ).each( function() {
+        $( this ).clone().attr( 'type', 'text' ).insertAfter( this ).datepicker().prev().remove();
+    } );
+}
+</code></pre>
+<p>This code basically copies the input element, converts it to <code>input[type=text]</code>, calls the <code>datepicker()</code> method on it and then removes the previous element.</p>
+<p>Admittedly, this method seems like a bit of a hack. At least it will be until jQuery UI datepicker plugin is updated to work with <code>input[type=date]</code>. After that, we can just use Modernizr to selectively call it on desktop browsers without having to do the whole copy and remove business.</p>
+<p>Give credit where credit is due: the clone/ remove code is not originally mine. I found it on <a href="http://stackoverflow.com/a/12617534/1368032">stackoverflow</a>. I modified it a little bit to make it work with my situation.</p>
+<p>Here&#8217;s a codepen I set up to demo this.</p>
+<pre class="codepen" data-height="300" data-type="result" data-href="nhbql" data-user="tnguyen14" data-safe="true"><code></code><a href="http://codepen.io/tnguyen14/pen/nhbql">Check out this Pen!</a></pre>
+<p><script async src="http://codepen.io/assets/embed/ei.js"></script></p>
+<p>The example I&#8217;ve used is for <code>datepicker()</code>. <code>timepicker()</code> should also work in a similar way.</p>
+
+		</div>
+		<footer class="main-footer">
+			Built by Tri Nguyen using <a href="https://github.com/tnguyen14/tobiko">tobiko</a>. Copyrights ® 2015.
+		</footer>
+
+		<script type="text/javascript">
+			var page = {
+				env: "prod"
+			}
+		</script>
+
+		<script type="text/javascript" src="/app.js"></script>
+	</body>
+</html>

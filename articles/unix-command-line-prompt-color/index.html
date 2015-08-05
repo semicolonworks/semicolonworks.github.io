@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<script type="text/javascript">
+	WebFontConfig = {
+		 google: { families: [ 'Source+Sans+Pro:400,700:latin' ] }
+	};
+	(function() {
+		var wf = document.createElement('script');
+		wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+			'://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+		wf.type = 'text/javascript';
+		wf.async = 'true';
+		var s = document.getElementsByTagName('script')[0];
+		s.parentNode.insertBefore(wf, s);
+	})();
+</script>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width">
+	<title>UNIX Command Line Prompt Color | semicolon.works</title>
+	<link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+	<h1>semicolon.works</h1>
+		<div class="post-single">
+			<h1>UNIX Command Line Prompt Color</h1>
+			<div class="article-date">08-04-2015</div>
+<p>a.k.a. first blog post on this site.</p>
+<h2>Foreword (you have been warned!):</h2>
+<p>I have decided to keep the design of this site simple and use the blog to keep track of my learning and exploration on the computer world.</p>
+<p>I will try my best to categorize and organize the post into some sort of order, but it&#8217;s hard to do that starting out without an overkill of empty categories and tags. This space is mostly going to be for myself to look back and document what I have learned though, so I think a certain degree of flexibility is allowed.</p>
+<p>Anyway, let&#8217;s get started.</p>
+<p>My first post is dedicated to how to change the color of your Command Line Prompt. In this case, I am using both Terminal.app and <a href="http://www.iterm2.com/" title="iTerm2">iTerm2.app</a> on Mac OSX Mountain Lion.</p>
+<p>My terminal, for the longest time, looks like this:</p>
+<p><img src="http://wp.tridnguyen.com/wp-content/uploads/2012/09/Screen-Shot-2012-09-17-at-6.44.09-PM.png" alt="Plain old Terminal look, with boring white text that is hard to distinguish from other things." title="plain old terminal" /></p>
+<p>I was getting tired of it, because, as a visual person, I find myself spending a lot of time trying to figure out which line was my prompt and which was the code. So I went on a Google search hunt to figure out the solution to change the color of my prompt.</p>
+<p>After poking at a few places, I came across this StackExchange question <a href="http://unix.stackexchange.com/questions/16120/in-bash-how-can-i-change-the-color-of-my-command-prompt" title="Change color of command prompt">&#8220;In bash how can I change the color of my command prompt?&#8221;</a>. The first two answers were kinda helpful, but the third one really caught my eyes. So I copied the simple code prompt into my terminal:</p>
+<pre><code class="bash">PS1='[e[1;31m][u@h W]$[e[0m] '
+</code></pre>
+<p>And it worked! The answerer also provided a quick breakdown of what the code meant, which is great.</p>
+<p>However, this only works for that session of terminal. Once you close the current terminal window and open a new one, it&#8217;s back to the default plain old white text.</p>
+<p>Luckily, at this point, after reading about 10 different sites on guides how to do this (none of which made a whole lot of sense to me, given my level of expertise with bash), I had an idea of copy and paste this line of code into a file and named it <code>.bash_profile</code> in my root folder (<code>cd ~</code>).</p>
+<p>And then, tadaa! It worked, again! (Tri: 2, computer: 0). At this point I was ecstatic because  the change is now permanent. My new terminal windows looks pretty like this:</p>
+<p><img src="http://wp.tridnguyen.com/wp-content/uploads/2012/09/Screen-Shot-2012-09-17-at-6.58.41-PM.png" alt="New Terminal look with colored prompt" title="new color command line" /></p>
+<p>So that is my attempt at changing the command line prompt color. If you are trying to do the same thing, give this method and try and see if it works. Let me know too if you think I&#8217;m doing something wrong or have a better way at doing it, because I would love to learn more about bash.</p>
+<p>Last but not least, here are a few notes and questions I still have lingered after this small exercise:</p>
+<h3>Notes:</h3>
+<ol>
+<li>You might recognize that the content of my prompt looks different. This is because with that single line of code, it also rearranges my standard command line output. It used to look like this:</li>
+</ol>
+<pre><code class="bash">Tris-MacBook-Air:~tringuyen$
+</code></pre>
+<p>which is in the format of <code>h:W u$</code>, which means <code>host</code>: current working directory <code>user</code> and <code>$</code>. (you can get the current format of your bash command line by typing in <code>echo $PS1</code>).</p>
+<ol>
+<li>If you have been trying to research on this for as long as I have, you might ask yourself &#8220;What the hell is the difference between a <code>.bashrc</code> file and a <code>.bash_profile</code> file?&#8221;. I was stumped with this question for a while, before coming across this <a href="http://www.joshstaiger.org/archives/2005/07/bash_profile_vs.html" title=".bash_profile vs .bashrc">great explanation by Josh Staiger about &#8220;.bash_profile vs .bashrc</a>, which fully answered my question (the main difference is that they&#8217;re config files for login and non-login shell &#8211; that&#8217;s all I can say, if you want in-depth explanation, read the article).</li>
+</ol>
+<h3>Questions</h3>
+<p>So I still have a few questions about this whole process:</p>
+<ol>
+<li>It seems to me that <code>bash</code> use a different color declaration convention than I am used to. I read somewhere that it is some sort of pair value, where <code>o; 31</code> means red and use 1 instead of 0 means a lighter red (which is what I used to the picture above). Would be great to find out a list of different colors I can make with this and try them out.</p>
+</li>
+<li>
+<p>I am still not sure what <code>tput</code> is and what it does, but it is used in the most popular answer in the stackexchange article above. I will need to wrap my head around that some time.</p>
+</li>
+<li>
+<p>The next challenge for me would be to further customize the terminal using the config file. An example of this would be to change the color of the actual code itself, other than just the prompt.</p>
+</li>
+</ol>
+<p>If you have any question/ comment/ suggestion, please leave a comment.</p>
+
+		</div>
+		<footer class="main-footer">
+			Built by Tri Nguyen using <a href="https://github.com/tnguyen14/tobiko">tobiko</a>. Copyrights ® 2015.
+		</footer>
+
+		<script type="text/javascript">
+			var page = {
+				env: "prod"
+			}
+		</script>
+
+		<script type="text/javascript" src="/app.js"></script>
+	</body>
+</html>

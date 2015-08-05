@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<script type="text/javascript">
+	WebFontConfig = {
+		 google: { families: [ 'Source+Sans+Pro:400,700:latin' ] }
+	};
+	(function() {
+		var wf = document.createElement('script');
+		wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+			'://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+		wf.type = 'text/javascript';
+		wf.async = 'true';
+		var s = document.getElementsByTagName('script')[0];
+		s.parentNode.insertBefore(wf, s);
+	})();
+</script>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width">
+	<title>Use aliasify to include configurations in your web application | semicolon.works</title>
+	<link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+	<h1>semicolon.works</h1>
+		<div class="post-single">
+			<h1>Use aliasify to include configurations in your web application</h1>
+			<div class="article-date">08-04-2015</div>
+<p>As I build more web applications, one problem that I keep running into is how to include application configurations into the application source code.</p>
+<h3>What do I mean by configurations?</h3>
+<p>They include application-specific settings such as the application name, API URL, debug mode etc. These are metadata to the application, similar to the metadata contained in <code>package.json</code> for a Node module.</p>
+<p>As I develop most of my applications locally, some of these settings will differ when the application is served on localhost versus when served in production. For eg., I usualy use a staging API server for local development and then a production server for deployment.</p>
+<h3>I could certainly hardcode these settings into the source code right?</h3>
+<p>The fact that I need 2 (or more) environment-specific versions of these settings make them difficult to be hardcoded. Furthermore, as a developer, I feel a little &#8220;dirty&#8221; when I hardcode these settings. Ideally, they should be declared in a JSON file somewhere, just like <code>package.json</code>.</p>
+<h3>There must be other solutions out there!</h3>
+<p>Surprisingly, there isn&#8217;t a good straight forward solution out there, as far as I know (if you know of one, please leave a comment). Here are a few worth mentioning:</p>
+<p>One can follow the approach outlined by Addy Osmani in <a href="http://addyosmani.com/blog/environment-specific-builds-with-grunt-gulp-or-broccoli/">making environment-specific builds with build tools</a> and use some sort of string replacement plugin. However, this will introduce some &#8216;not-so-pretty&#8217; delimiters in the codebase, such as <code>@@foo</code> used by grunt-replace.</p>
+<p>Henrik Joreteg&#8217;s <a href="https://github.com/HenrikJoreteg/clientconfig">clientconfig</a> is another elegant solution and very close to what I have in mind, however it relies on a server component to set all the configurations in a cookie. This is not a hard requirement, but is not feasible for a static site running on a simple file server (such as Github Pages) like this blog.</p>
+<h3>Another attempt at solving this problem</h3>
+<p>If you are using <a href="https://github.com/substack/node-browserify">browserify</a> to bundle your JavaScript code, this might be a good solution for you.</p>
+<p>Using <a href="https://github.com/benbria/aliasify">aliasify</a>, you can require your config, which is declared in a <code>config.json</code> file like this:</p>
+<pre><code class="language-javascript">{
+  "API_URL": "http://example_server.com/api",
+  "env": "development"
+}
+</code></pre>
+<pre><code class="language-javascript">var config = require('config');
+
+console.log(config.API_URL); //prints out API_URL
+if (config.env === 'development') {
+  // do something specifically in development mode
+}
+</code></pre>
+<p>To declare this transformation, you can add the following section to <code>package.json</code>:</p>
+<pre><code class="language-javascript">{
+  "aliasify": {
+    aliases: {
+      "config": "./config.json"
+    }
+  }
+}
+</code></pre>
+<p>Pretty simple, right?</p>
+<h3>Environment-specific configs</h3>
+<p>We can make this even better, by allowing for environment-sepcific configs. To do that, I recommend using a build tool like grunt or gulp. I am sure there is probably a way to do it with just the simple browserify command line interface, but using browserify programmatically makes things a lot easier.</p>
+<p>Here&#8217;s an example of how I am using this in a recent project:</p>
+<pre><code class="language-javascript">// gulpfile.js
+
+// enable development mode
+var dev = false;
+gulp.task('enable-dev-mode', function () {
+  dev = true;
+});
+
+gulp.task('scripts', function () {
+  // set up browserify bundle in here
+  // see https://github.com/gulpjs/gulp/blob/master/docs/recipes/browserify-uglify-sourcemap.md
+
+  // aliasify config
+  var aliasify = require('aliasify').configure({
+  aliases: {
+    'config': './config' + (dev ? '.dev' : '') + '.json'
+  },
+  configDir: __dirname
+  })
+  bundler.transform(aliasify);
+});
+</code></pre>
+<p>In this approach, aliasify will automatically use <code>config.dev.json</code> for development environment and <code>config.json</code> for production one.</p>
+<p>A similar approach could be taken when using <a href="https://github.com/jmreidy/grunt-browserify">grunt-browserify</a>. In fact, it is probably easier to do environment-specific stuff with grunt due to its ability to declare a task target.</p>
+<p>There you have it, a simple approach to accessing environment configuations in your project that is made possible by browserify.</p>
+<h3>What&#8217;s bad, what&#8217;s good, what could be better?</h3>
+<p>This solution&#8217;s downside is relying on browserify (and possibly a build system), which might not be applicable for an older project. If you use RequireJS/AMD, I imagine it&#8217;d be similarly easy to include such a config file using the <a href="https://github.com/millermedeiros/requirejs-plugins">JSON plugin</a>.</p>
+<p>One possible improvement to this solution is allowing the ability to cascade configs across environment. For example:</p>
+<p>In <code>config.json</code></p>
+<pre><code class="language-javascript">{
+  "appName": "FooBar",
+  "apiUrl": "http://foobar.com/api"
+}
+</code></pre>
+<p>And then <code>config.dev.json</code> just &#8220;extend&#8221; it without redeclaring common configs:</p>
+<pre><code class="language-javascript">{
+  "apiUrl": "http://localhost:3000"
+}
+</code></pre>
+<p>This is currently not possible with using aliasify. I have implemented a similar version of this as a grunt task for <a href="https://github.com/tnguyen14/tobiko#configjson">tobiko</a>, but it&#8217;s not polished enough to be used by others yet. I will update this space if and when this becomes available.</p>
+
+		</div>
+		<footer class="main-footer">
+			Built by Tri Nguyen using <a href="https://github.com/tnguyen14/tobiko">tobiko</a>. Copyrights ® 2015.
+		</footer>
+
+		<script type="text/javascript">
+			var page = {
+				env: "prod"
+			}
+		</script>
+
+		<script type="text/javascript" src="/app.js"></script>
+	</body>
+</html>

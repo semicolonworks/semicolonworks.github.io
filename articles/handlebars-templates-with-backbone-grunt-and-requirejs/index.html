@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<script type="text/javascript">
+	WebFontConfig = {
+		 google: { families: [ 'Source+Sans+Pro:400,700:latin' ] }
+	};
+	(function() {
+		var wf = document.createElement('script');
+		wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+			'://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+		wf.type = 'text/javascript';
+		wf.async = 'true';
+		var s = document.getElementsByTagName('script')[0];
+		s.parentNode.insertBefore(wf, s);
+	})();
+</script>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width">
+	<title>Handlebars templates with Backbone, grunt.js and RequireJS | semicolon.works</title>
+	<link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+	<h1>semicolon.works</h1>
+		<div class="post-single">
+			<h1>Handlebars templates with Backbone, grunt.js and RequireJS</h1>
+			<div class="article-date">08-04-2015</div>
+<p>Integrating Handlebars templates in modern web development workflow has been crucial in helping me organize my code neatly and maintain sanity. I want to achieve a few things:</p>
+<ul>
+<li>avoid the <code>&lt;script&gt;</code> tags to take advantage of syntax highlighting,</li>
+<li>break large templates into smaller files that can be managed and reused (componentized),</li>
+<li>automatically compiles and ready for use, and</li>
+<li>namespaced with file names as template names.</li>
+</ul>
+<p>In a current Backbone.js application at work, which is set up with <a href="gruntjs.com">grunt</a> and <a href="requirejs.org">RequireJS</a> (you can find a similar set up with the default <a href="https://github.com/yeoman/generator-backbone/">yeoman backbone generator</a>), I have found the following set up to meet most of these goals.</p>
+<p>I can use the templates with RequireJS in the views like so:</p>
+<pre><code class="language-javascript">// viewOne.js
+
+// I use commonjs syntax with require
+// http://requirejs.org/docs/whyamd.html#sugar
+var Templates = require('templates');
+var viewTemplate = Templates.viewOne;
+var html = viewTemplate({data: 'test'});
+</code></pre>
+<p>The template directories look something like this</p>
+<pre><code class="language-bash">app/templates/
+├── viewOne.hbs
+├── viewTwo.hbs
+├── viewThree.hbs
+├── ...
+└── viewTwentyThree.hbs
+
+0 directories, 23 files
+</code></pre>
+<p>I use <a href="https://github.com/gruntjs/grunt-contrib-handlebars"><code>grunt-contrib-handlebars</code></a> to compile the templates. Here&#8217;s the Gruntfile.js config for local development:</p>
+<pre><code class="language-javascript">handlebars: {
+    compile: {
+        options: {
+            amd: true,
+            namespace: 'Templates',
+            partialsUseNamespace: true,
+            processName: function(filePath) {
+                var file = filePath.replace(/.*/(w+).hbs/, '$1');
+                return file;
+            }
+        },
+        files:{
+            '.tmp/scripts/templates.js': ['&lt;%= yeoman.app %&gt;/templates/*.hbs']
+        }
+    }
+}
+</code></pre>
+<p>The above code does a few things. More detailed explanation of what each <code>options</code> does can be found on the plugin github page.</p>
+<ul>
+<li>The <code>processName</code> function takes the files and use their name as the template name.</li>
+<li>With <code>partialsUseNamespace</code> turned on, you can use partials both within your template as <code>&gt; partial</code> or through the global <code>Templates</code> object.</li>
+</ul>
+<p>In the build step for deployment, instead of just outputing the compiled templates into the <code>.tmp</code> folder, RequireJS can put Templates in the optimized javascript with the following Grunt task config (note the <code>paths</code> option):</p>
+<pre><code class="language-javascript">requirejs: {
+    dist: {
+        options: {
+            baseUrl: '&lt;%= yeoman.app %&gt;/scripts',
+            optimize: 'none',
+            paths: {
+                'templates': '../../.tmp/scripts/templates'
+            }
+        }
+    }
+}
+</code></pre>
+<p>This simple set up has allowed me to rapidly develop a complex apps by breaking down complex templates into small reusuable components and use them liberally anywhere with RequireJS, yet keep the built JavaScript minimal and compressed. I hope it will be useful for others who might be looking for a similar solution. If you find this useful or would like to suggest an improvement, please leave a comment.</p>
+
+		</div>
+		<footer class="main-footer">
+			Built by Tri Nguyen using <a href="https://github.com/tnguyen14/tobiko">tobiko</a>. Copyrights ® 2015.
+		</footer>
+
+		<script type="text/javascript">
+			var page = {
+				env: "prod"
+			}
+		</script>
+
+		<script type="text/javascript" src="/app.js"></script>
+	</body>
+</html>

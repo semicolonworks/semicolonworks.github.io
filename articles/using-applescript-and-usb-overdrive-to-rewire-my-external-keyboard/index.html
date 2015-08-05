@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<script type="text/javascript">
+	WebFontConfig = {
+		 google: { families: [ 'Source+Sans+Pro:400,700:latin' ] }
+	};
+	(function() {
+		var wf = document.createElement('script');
+		wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+			'://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+		wf.type = 'text/javascript';
+		wf.async = 'true';
+		var s = document.getElementsByTagName('script')[0];
+		s.parentNode.insertBefore(wf, s);
+	})();
+</script>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width">
+	<title>Using AppleScript and USB Overdrive to rewire my external keyboard | semicolon.works</title>
+	<link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+	<h1>semicolon.works</h1>
+		<div class="post-single">
+			<h1>Using AppleScript and USB Overdrive to rewire my external keyboard</h1>
+			<div class="article-date">08-04-2015</div>
+<p>So I&#8217;ve recently made an investment in the <a href="http://www.kinesis-ergo.com/freestyle2_mac.htm">Kinesis Freestyle 2 for Mac</a> &#8211; an amazing keyboard that is supposed to be ergonomic and very friendly for your hands to type.</p>
+<p>After playing it for a while, I really like it except for one thing &#8211; when I press the <code>prev</code>, <code>play/pause</code> and <code>next</code> buttons, it will always bring up iTunes even if Spotify is open. This is very annoying as I&#8217;ve said goodbye to iTunes long time ago and have migrated over to Spotify. It is also different from the default behavior of the Mac&#8217;s native keyboard. If I press these buttons on the default keyboard while Spotify is open, it will just play Spotify. Same goes for QuickTime Player.</p>
+<p>This annoys me enough that I spent the past 2 hours looking into a solution. I&#8217;ve found one that is sort of a workaround that works well for me for now, so I thought I should leave it here. <span class="more"></span></p>
+<p>First, I use <a href="http://www.usboverdrive.com/">USB Overdrive</a> to manage the behavior of external mice and keyboards. It is just an incredible piece of software in terms of the amount of control it gives you.</p>
+<p>It is almost perfect for what I need to do, except that for Media keys, it only allows mapping to iTunes commands.</p>
+<p>To gives Spotify any sort of priority, I have to use the <em>&#8216;Execute AppleScript&#8217;</em> feature. Even for someone who&#8217;s relatively good at programming, this was scary to me at first. The thought of programmatically alter my Mac was a scary thought, and a downhill move I thought. That is until I learned how friendly AppleScript is. Here&#8217;s a little code I wrote to get the <code>play/pause</code> button do what I want:</p>
+<pre><code class="bash"># prioritize Spotify first
+if application "Spotify" is running then
+    tell application "Spotify" to playpause
+
+# if Spotify isn't open, QuickTime Player is second on the list
+else if application "QuickTime Player" is running then
+    tell application "QuickTime Player"
+        tell document 1 to if exists then
+            if playing then
+                pause
+            else
+                play
+            end if
+        end if
+    end tell
+
+# only play iTunes when nothing else is open
+else if application "iTunes" is running then
+    tell application "iTunes" to playpause
+
+# if no media app is open, start Spotify and play some tunes!
+else
+    tell application "Spotify"
+        activate
+        delay 2 -- I added this in because having play right after activate doesn't quite work. It turns out the delay gives it a nice fade in effect
+        play
+    end tell
+end if
+</code></pre>
+<p>This is an opinionated solution to what to do. It is also limited to currently 3 apps right now, so it&#8217;s probably not as versatile as the built-in keys. However, for now, these are the 3 apps I use the most. If you use &#8220;VLC&#8221;, then just replace &#8220;QuickTime Player&#8221; with that, or put it before QuickTime.</p>
+<p>Here are another example of what I did with my <code>previous</code> button. The <code>next</code> button is pretty much the same.</p>
+<pre><code class="bash">if application "Spotify" is running then
+    tell application "Spotify" to previous track
+
+else if application "QuickTime Player" is running then
+    tell application "QuickTime Player"
+        tell document 1 to if exists then
+            step backward
+        end if
+    end tell
+else if application "iTunes" is running then
+    tell application "iTunes" to previous track
+end if
+</code></pre>
+<p>I hope this is helpful to someone out there who&#8217;s looking to get more power of their keyboard and mouse mappings. As you can see, there is a limitless number of things you can do with this.</p>
+<p>One more note, to start writing AppleScript, a good place to start is open the &#8216;AppleScript Editor&#8217; on your Mac. Once you&#8217;re there, you can open the Application Dictionary through the shortcut <code>cmd + shift + O</code> or &#8220;File -> Open Dictionary&#8221;. Have fun!</p>
+
+		</div>
+		<footer class="main-footer">
+			Built by Tri Nguyen using <a href="https://github.com/tnguyen14/tobiko">tobiko</a>. Copyrights ® 2015.
+		</footer>
+
+		<script type="text/javascript">
+			var page = {
+				env: "prod"
+			}
+		</script>
+
+		<script type="text/javascript" src="/app.js"></script>
+	</body>
+</html>

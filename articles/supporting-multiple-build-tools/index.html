@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<script type="text/javascript">
+	WebFontConfig = {
+		 google: { families: [ 'Source+Sans+Pro:400,700:latin' ] }
+	};
+	(function() {
+		var wf = document.createElement('script');
+		wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+			'://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+		wf.type = 'text/javascript';
+		wf.async = 'true';
+		var s = document.getElementsByTagName('script')[0];
+		s.parentNode.insertBefore(wf, s);
+	})();
+</script>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width">
+	<title>Supporting multiple build tools | semicolon.works</title>
+	<link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+	<h1>semicolon.works</h1>
+		<div class="post-single">
+			<h1>Supporting multiple build tools</h1>
+			<div class="article-date">08-04-2015</div>
+<p>At Demandware, I work on a reference application &#8211; sort of like a starting point for developers to use in building a e-commerce web application. Its purpose is to cut down on implementation time. One of the demands for this project is to create something that can be used and liked many developers with varied backgrounds, experiences and opinions.</p>
+<p>When I decided to introduce a much needed modern build tool into the project (for things like compiling Sass to CSS, bundling browserify modules, running tests etc.), I was met with a choice of whether to use grunt or gulp.</p>
+<p>While grunt has grown to be quite popular among many developers (the ones at my company included), there are limits to its approach that make it clunky to work with (a declarative API in defining tasks, different tasks interact with each other through the file system). Gulp has gained quite a bit of popularity due to its approach of using stream and a programmatic API. Admittedly, gulp is a lot more fun for me to use and maintain.</p>
+<p>However, this was not a straightforward choice as many people were voicing concern against going after the &#8220;latest and greatest&#8221; tool, and wanting to keep the technology stack consistent within the enterprise. While this is not an argument I agree with, I could appreciate and respect the intention.</p>
+<p>Instead of plunging into a heated debate with other engineers over what is a better build tool, I decided to support both for the project. In retrospect, this decision has turned out to be a wise one.</p>
+<p>It makes the idea of introducing a build tool that much easier to sell. I have the ability of pitch it by saying something like &#8220;you can use either gulp or grunt, and they both would work the same&#8221;. It appeals to three groups &#8211; the ones who have spent time and effort learning grunt and feel comfortable in it, the ones who keep more up to date with bleeding edge, and also the ones who do not know either but want to learn/ use one.</p>
+<p>Furthermore, it sets the expectation that while a build tool is needed and important in modern web development, the project is not tied to a single tool. This opens up room for experimentation with new workflow and tooling options. If a new tool is available, it should be adopted and played with, regardless of whether it is a grunt or gulp tool. This also means that a completely new build tool can be experimented with as well, be it broccoli, npm run-scripts, or (gasp!) even make. We promise that the interface and tasks should be <strong>eventually</strong> consistent across these build tools, but they do not have to be on parity at any single time. We do try however to make the most basic tasks such as Sass and browserify to be available across all build tools.</p>
+<p>While this setup makes a lot of sense for our project, it might not be as practical or wise for others, especially those that are used/ maintained by a small group of people whose preferences/ opinions are more closely aligned. Having said that, I find it quite liberating and welcoming to newcomers to a project to have different build tools available. It is sort of like a quiet nod to all the three groups I mentioned above, making sure that none of them feels particularly left out. I have come to strongly believe that in order to make a project successful, it is usually helpful to make contributors, especially newcomers, feel welcomed and comfortable.</p>
+
+		</div>
+		<footer class="main-footer">
+			Built by Tri Nguyen using <a href="https://github.com/tnguyen14/tobiko">tobiko</a>. Copyrights ® 2015.
+		</footer>
+
+		<script type="text/javascript">
+			var page = {
+				env: "prod"
+			}
+		</script>
+
+		<script type="text/javascript" src="/app.js"></script>
+	</body>
+</html>
